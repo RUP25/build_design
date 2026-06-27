@@ -125,10 +125,16 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
             {services.map((service, i) => {
               const isActive = i === activeIndex;
               const isNext = i === activeIndex + 1;
-              const enter = isActive ? 1 - smoothstep(progress) : 0;
-              const leave = isActive ? smoothstep(progress) : 0;
+              const isLastSlide = activeIndex === services.length - 1;
+              const leave =
+                isActive && !isLastSlide ? smoothstep(progress) : 0;
+              const enter = isActive ? 1 - leave : 0;
               const opacity = isActive ? 1 - leave : isNext ? smoothstep(progress) : 0;
-              const translateY = isActive ? leave * -48 : isNext ? (1 - smoothstep(progress)) * 48 : 48;
+              const translateY = isActive
+                ? leave * -48
+                : isNext
+                  ? (1 - smoothstep(progress)) * 48
+                  : 48;
 
               if (opacity <= 0.01 && !isActive && !isNext) return null;
 
@@ -142,7 +148,7 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
                     pointerEvents: opacity > 0.5 ? "auto" : "none",
                   }}
                 >
-                  <div className="flex min-h-0 flex-col justify-between overflow-y-auto pr-0.5 lg:overflow-visible lg:pr-0">
+                  <div className="flex min-h-0 flex-col justify-start overflow-y-auto pr-0.5 lg:justify-between lg:overflow-visible lg:pr-0">
                     <div>
                       <h3 className="heading-display mb-3 text-2xl leading-[0.95] sm:mb-6 sm:text-3xl md:text-4xl lg:text-[2.75rem]">
                         {service.headline.map((line) => (
@@ -155,7 +161,7 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
                         {service.description}
                       </p>
                     </div>
-                    <ul className="mt-4 space-y-2 sm:mt-8 sm:space-y-3">
+                    <ul className="mt-4 space-y-2 sm:mt-6 sm:space-y-3">
                       {service.items.map((item) => (
                         <li
                           key={item}

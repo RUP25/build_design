@@ -33,7 +33,7 @@ export function HomePage() {
       {!introDone && <IntroSequence onComplete={handleIntroComplete} />}
       <Header />
       <main>
-        <HomeScrollExperience />
+        <HomeScrollExperience enabled={introDone} />
         <ProcessModelScrollSection />
         <Credibility />
         <FAQ />

@@ -98,7 +98,6 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               {/* Framed photo — appears between the words after the initial beat */}
               {!reveal && shown && (
                 <motion.div
-                  layoutId="intro-frame"
                   initial={{ opacity: 0, scale: 0.35 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.55, ease: EASE }}
@@ -151,7 +150,8 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           {/* The same photo opens up to become the full main screen */}
           {reveal && (
             <motion.div
-              layoutId="intro-frame"
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
               style={{ borderRadius: 0 }}
               className="absolute inset-0 overflow-hidden"
               transition={{ duration: 0.9, ease: EASE }}

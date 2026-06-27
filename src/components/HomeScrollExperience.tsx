@@ -5,24 +5,35 @@ import { HeroBlindTransition } from "@/components/HeroBlindTransition";
 
 // ─── Hero background (Reaktor-style vertical blind transitions, auto-advance) ─
 
-type HeroSlide = { name: string; headline: string; image: string };
+type HeroSlide = {
+  name: string;
+  headline: string;
+  subtext?: string | string[];
+  image: string;
+};
 
 const HERO_SLIDES: HeroSlide[] = [
   {
     name: "Private Residences",
     headline: "Private Residences.",
+    subtext:
+      "Luxury homes and bungalows executed with complete structural, system, and finishing integration. Whether it's a minimalist studio or a classic heritage bungalow, we infuse each space with warmth, character, and usability.",
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80",
   },
   {
-    name: "Commercial Spaces",
-    headline: "Commercial Spaces.",
+    name: "Commercial & Corporate Spaces",
+    headline: "Commercial & Corporate Spaces.",
+    subtext:
+      "High-performance environments including offices, airport projects, hospitality, and branded spaces.",
     image:
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80",
   },
   {
     name: "Solid wood work",
     headline: "Solid wood work.",
+    subtext:
+      "We specialize in creating functional, elegant interiors and handcrafted furniture pieces — from solid wood beds and dining sets to console tables and library cabinets.",
     image:
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80",
   },
@@ -147,6 +158,12 @@ function clamp(v: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
 }
 
+/** Stable viewport height — avoids mobile URL bar resize jank during scroll animations. */
+function getViewportHeight() {
+  if (typeof window === "undefined") return 800;
+  return window.visualViewport?.height ?? window.innerHeight;
+}
+
 function smoothstep(t: number) {
   const c = clamp(t);
   return c * c * (3 - 2 * c);
@@ -166,15 +183,6 @@ function lerp(a: number, b: number, t: number) {
 
 function track(p: number, a: number, b: number) {
   return smoothstep(clamp((p - a) / (b - a)));
-}
-
-function trackEase(
-  p: number,
-  a: number,
-  b: number,
-  ease: (t: number) => number = smoothstep,
-) {
-  return ease(clamp((p - a) / (b - a)));
 }
 
 // ─── Horizontal bubble carousel (Reaktor: right → left conveyor) ─────────────
@@ -392,13 +400,16 @@ function CategoryPill({
 }
 
 function useHeroAutoSlide(handoffT: number) {
-  const active = handoffT < 0.98;
+  const active = handoffT < 0.01;
 
   const [slideIndex, setSlideIndex] = useState(0);
   const [transitionT, setTransitionT] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+      setTransitionT(0);
+      return;
+    }
 
     let holdTimer = 0;
     let raf = 0;
@@ -431,12 +442,12 @@ function useHeroAutoSlide(handoffT: number) {
   }, [active]);
 
   const activeSlide =
-    transitionT > 0.5 ? (slideIndex + 1) % HERO_SLIDES.length : slideIndex;
+    transitionT > 0.52 ? (slideIndex + 1) % HERO_SLIDES.length : slideIndex;
 
   return { slideIndex, transitionT, activeSlide };
 }
 
-export function HomeScrollExperience() {
+export function HomeScrollExperience({ enabled = true }: { enabled?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const taglineTrackRef = useRef<HTMLDivElement>(null);
   const designRef = useRef<HTMLSpanElement>(null);
@@ -497,9 +508,9 @@ export function HomeScrollExperience() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const rect = container.getBoundingClientRect();
-        const scrollable = container.offsetHeight - window.innerHeight;
+        const vh = getViewportHeight();
+        const scrollable = container.offsetHeight - vh;
         const scrolled = Math.max(0, -rect.top);
-        const vh = window.innerHeight;
 
         if (scrollable <= 0) {
           setP(0);
@@ -517,10 +528,12 @@ export function HomeScrollExperience() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.visualViewport?.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.visualViewport?.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -530,19 +543,27 @@ export function HomeScrollExperience() {
     activeSlide: activeHeroSlide,
   } = useHeroAutoSlide(handoffT);
 
-  // ── Hero handoff: shrink into rounded card + slide up (Reaktor) ──
-  const shrinkT = trackEase(handoffT, 0, 0.7, easeInOutQuint);
-  const heroInsetVw = lerp(0, 3.25, shrinkT);
-  const heroInsetVh = lerp(0, 2.4, shrinkT);
-  const heroRadius = lerp(0, 32, shrinkT);
-  const heroSlideY = lerp(0, -102, handoffT);
+  // ── Hero handoff: shrink into rounded card, then slide up (single element) ──
+  const handoffEase = easeInOutQuint(clamp(handoffT));
+  const shrinkT = track(handoffEase, 0, 0.62);
+  const slideT = track(handoffEase, 0.38, 1);
+  const heroInsetVw = lerp(0, tier === "sm" ? 2.5 : 3.25, shrinkT);
+  const heroInsetVh = lerp(0, tier === "sm" ? 1.8 : 2.4, shrinkT);
+  const heroRadius = lerp(0, tier === "sm" ? 20 : 32, shrinkT);
+  const heroSlideVh = lerp(0, -112, slideT);
   const heroShadow =
-    shrinkT > 0.01
+    shrinkT > 0.02
       ? `0 ${lerp(4, 18, shrinkT)}px ${lerp(20, 56, shrinkT)}px -${lerp(6, 14, shrinkT)}px rgba(26,24,20,${lerp(0.08, 0.22, shrinkT)})`
       : "none";
-  const heroVisible = handoffT < 1 || heroSlideY > -99.5;
+  const heroEndFade =
+    handoffT >= 0.96 ? clamp(1 - (handoffT - 0.96) / 0.04) : 1;
+  const heroVisibleOpacity = enabled ? heroEndFade : 0;
+  const showcaseHandoff = track(handoffEase, 0.42, 0.94);
   const showcaseOpacity = clamp(
-    Math.max(handoffT, track(p, HANDOFF_END_P - 0.04, HANDOFF_END_P + 0.06)),
+    Math.max(
+      showcaseHandoff,
+      track(p, HANDOFF_END_P - 0.04, HANDOFF_END_P + 0.06),
+    ),
   );
 
   // ── Ticker: rises with hero → holds at top → fades then exits (Reaktor) ──
@@ -550,7 +571,7 @@ export function HomeScrollExperience() {
   const tickerExitT = track(p, TICKER_FADE_END_P, TICKER_EXIT_END_P);
   const marqueeTopPct =
     handoffT < 1
-      ? lerp(108, 18, handoffT)
+      ? lerp(108, 18, handoffEase)
       : p < TICKER_FADE_END_P
         ? 18
         : lerp(18, -10, tickerExitT);
@@ -558,7 +579,7 @@ export function HomeScrollExperience() {
     handoffT <= 0
       ? 0
       : handoffT < 1
-        ? clamp(handoffT * 1.2)
+        ? clamp(handoffEase * 1.2)
         : p < TICKER_HOLD_END_P
           ? 1
           : 1 - tickerFadeT;
@@ -588,13 +609,16 @@ export function HomeScrollExperience() {
   const activeCategory = GRID_SPHERES[activeSphere].categoryIndex;
   const showcaseBg =
     bubblesVisible > 0.05 ? CATEGORY_BG[activeCategory] : CATEGORY_BG[0];
+  // Keep cream behind the card until handoff finishes — avoids showcase bleeding through margins.
+  const stickyBg =
+    handoffT > 0.01 && handoffT < 0.98 ? CATEGORY_BG[0] : showcaseBg;
 
-  const headlineOpacity = lerp(1, 0, track(handoffT, 0.08, 0.72));
-  const taglineOpacity = lerp(1, 0, track(handoffT, 0.88, 1));
+  const headlineOpacity = lerp(1, 0, track(shrinkT, 0.1, 0.85));
+  const taglineOpacity = lerp(1, 0, track(handoffEase, 0.72, 0.98));
 
   // Line anchored after Build; Design moves left and consumes the line from the right
-  const meetT = handoffT;
-  const taglineScale = lerp(1, 1.28, meetT);
+  const meetT = shrinkT;
+  const taglineScale = lerp(1, tier === "sm" ? 1.1 : 1.28, meetT);
   const taglineSize =
     tier === "sm"
       ? "clamp(1.05rem,4.2vw,1.35rem)"
@@ -608,8 +632,6 @@ export function HomeScrollExperience() {
   const designLeftPx = (1 - meetT) * (maxLineWidth + taglineMetrics.gapPx);
   const taglineLift = lerp(0, 8, meetT);
 
-  const handoffActive = handoffT > 0.001;
-
   return (
     <div
       id="home-scroll"
@@ -618,13 +640,9 @@ export function HomeScrollExperience() {
       style={{ height: `${SCROLL_VH}vh` }}
     >
       <div
-        className={`home-sticky-viewport sticky top-0 overflow-x-hidden ${
-          handoffActive || bubblesVisible > 0.02
-            ? "overflow-y-visible"
-            : "overflow-y-clip"
-        }`}
+        className="home-sticky-viewport sticky top-0 overflow-hidden"
         style={{
-          backgroundColor: showcaseBg,
+          backgroundColor: stickyBg,
           transition: "background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
@@ -807,48 +825,66 @@ export function HomeScrollExperience() {
           )}
         </div>
 
-        {/* ── Hero layer — shrinks with rounded edges, then slides up ── */}
+        {/* ── Hero card — shrinks, rounds, then slides up (one layer, no ghost) ── */}
         <div
-          className="absolute overflow-hidden will-change-[transform,border-radius]"
+          className="absolute z-30 overflow-hidden [contain:strict] [backface-visibility:hidden]"
           style={{
-            top: `${heroInsetVh}vh`,
+            top: `${heroInsetVh}dvh`,
             left: `${heroInsetVw}vw`,
-            right: `${heroInsetVw}vw`,
-            height: `calc(100vh - ${heroInsetVh * 2}vh)`,
-            transform: `translate3d(0, ${heroSlideY}vh, 0)`,
-            opacity: heroVisible ? 1 : 0,
-            pointerEvents: heroVisible ? "auto" : "none",
-            zIndex: 30,
+            width: `calc(100% - ${heroInsetVw * 2}vw)`,
+            height: `calc(100dvh - ${heroInsetVh * 2}dvh)`,
             borderRadius: `${heroRadius}px`,
             boxShadow: heroShadow,
+            transform: `translate3d(0, ${heroSlideVh}dvh, 0)`,
+            opacity: heroVisibleOpacity,
+            visibility:
+              !enabled || heroVisibleOpacity < 0.02 ? "hidden" : "visible",
+            pointerEvents: handoffT < 0.92 ? "auto" : "none",
           }}
         >
           <HeroBlindTransition
             slides={HERO_SLIDES}
             slideIndex={heroSlideIndex}
             transitionT={heroTransitionT}
+            frozen={handoffT > 0.01}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/55 to-charcoal/25" />
 
           <div
-            className="absolute left-4 top-[50%] z-10 max-w-[calc(100vw-2rem)] sm:left-6 sm:top-[56%] sm:max-w-3xl lg:left-12 lg:top-[58%]"
+            className="absolute left-4 top-[30%] z-10 max-w-[calc(100vw-2rem)] sm:left-6 sm:top-[36%] sm:max-w-3xl lg:left-12 lg:top-[40%]"
             style={{ opacity: headlineOpacity }}
           >
             <div className="relative grid">
               {HERO_SLIDES.map((slide, i) => {
                 const isActive = i === activeHeroSlide;
                 return (
-                  <h1
+                  <div
                     key={slide.name}
-                    className="heading-display col-start-1 row-start-1 text-[clamp(2rem,7vw,5.5rem)] leading-[1.05] text-cream transition-[opacity,transform] duration-500 ease-out sm:text-[clamp(2.5rem,6vw,5.5rem)]"
+                    className="col-start-1 row-start-1 transition-opacity duration-300 ease-out"
                     style={{
                       opacity: isActive ? 1 : 0,
-                      transform: isActive ? "translateY(0)" : "translateY(18px)",
+                      visibility: isActive ? "visible" : "hidden",
                       pointerEvents: isActive ? "auto" : "none",
                     }}
                   >
-                    {slide.headline}
-                  </h1>
+                    <h1 className="heading-display text-[clamp(2rem,7vw,5.5rem)] leading-[1.05] text-cream sm:text-[clamp(2.5rem,6vw,5.5rem)]">
+                      {slide.headline}
+                    </h1>
+                    {slide.subtext &&
+                      (Array.isArray(slide.subtext)
+                        ? slide.subtext
+                        : [slide.subtext]
+                      ).map((line, lineIndex) => (
+                        <p
+                          key={lineIndex}
+                          className={`max-w-md text-sm leading-relaxed text-cream/75 sm:max-w-lg sm:text-base lg:max-w-xl ${
+                            lineIndex === 0 ? "mt-3 sm:mt-4" : "mt-2 sm:mt-3"
+                          }`}
+                        >
+                          {line}
+                        </p>
+                      ))}
+                  </div>
                 );
               })}
             </div>
