@@ -13,6 +13,11 @@ export const whatsappContact = {
     "Hello Build Design Projects, I would like to discuss my project.",
 };
 
+export const companyAddress = {
+  line1: "30f, Mirza Ghalib Street (Free school street)",
+  line2: "Kolkata - 700016",
+};
+
 export const aboutSpecialization =
   "We specialize in creating functional, elegant interiors and handcrafted furniture pieces — from solid wood beds and dining sets to console tables and library cabinets. Whether it's a minimalist studio or a classic heritage bungalow, we infuse each space with warmth, character, and usability.";
 

@@ -1,3 +1,5 @@
+import { companyAddress } from "@/lib/content";
+
 export function Footer() {
   return (
     <footer className="bg-charcoal py-16 text-cream">
@@ -44,7 +46,13 @@ export function Footer() {
                 Info@buildesignprojects.com
               </p>
               <p className="mb-1 text-sm text-cream/70">+91 9831038457</p>
-              <p className="text-sm text-cream/70">033 2252 4444</p>
+              <p className="mb-4 text-sm text-cream/70">033 2252 4444</p>
+              <p className="section-label mb-2 text-cream/50">Address</p>
+              <address className="not-italic text-sm leading-relaxed text-cream/70">
+                {companyAddress.line1}
+                <br />
+                {companyAddress.line2}
+              </address>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import Image from "next/image";
 import { FadeIn, SectionHeading, SectionLabel } from "@/components/ui/FadeIn";
 import { useSectionParallax } from "@/hooks/useSectionParallax";
+import { companyAddress } from "@/lib/content";
 
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -83,6 +84,15 @@ export function Contact() {
                 >
                   Info@buildesignprojects.com
                 </a>
+              </div>
+
+              <div>
+                <p className="section-label mb-3 text-cream/50">Address</p>
+                <address className="not-italic leading-relaxed text-cream">
+                  {companyAddress.line1}
+                  <br />
+                  {companyAddress.line2}
+                </address>
               </div>
 
               <div>
