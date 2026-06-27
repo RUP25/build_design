@@ -447,6 +447,145 @@ function useHeroAutoSlide(handoffT: number) {
   return { slideIndex, transitionT, activeSlide };
 }
 
+function HeroSlideCopy({
+  slide,
+  headlineOpacity = 1,
+  headlineTranslateX = 0,
+  subtextOpacity = 1,
+  subtextTranslateX = 0,
+}: {
+  slide: HeroSlide;
+  headlineOpacity?: number;
+  headlineTranslateX?: number;
+  subtextOpacity?: number;
+  subtextTranslateX?: number;
+}) {
+  return (
+    <>
+      <h1
+        className="heading-display text-[clamp(2rem,7vw,5.5rem)] leading-[1.05] text-cream will-change-transform sm:text-[clamp(2.5rem,6vw,5.5rem)]"
+        style={{
+          opacity: headlineOpacity,
+          transform: `translate3d(${headlineTranslateX}px, 0, 0)`,
+        }}
+      >
+        {slide.headline}
+      </h1>
+      {slide.subtext &&
+        (Array.isArray(slide.subtext) ? slide.subtext : [slide.subtext]).map(
+          (line, lineIndex) => (
+            <p
+              key={lineIndex}
+              className={`max-w-md text-sm leading-relaxed text-cream/75 will-change-transform sm:max-w-lg sm:text-base lg:max-w-xl ${
+                lineIndex === 0 ? "mt-3 sm:mt-4" : "mt-2 sm:mt-3"
+              }`}
+              style={{
+                opacity: subtextOpacity,
+                transform: `translate3d(${subtextTranslateX}px, 0, 0)`,
+              }}
+            >
+              {line}
+            </p>
+          ),
+        )}
+    </>
+  );
+}
+
+/** Title leads, subtext follows — both slide horizontally. */
+function heroTextMotion(t: number, direction: "in" | "out") {
+  if (direction === "in") {
+    const headlineT = smoothstep(clamp(t / 0.58));
+    const subtextT = smoothstep(clamp((t - 0.34) / 0.66));
+    return {
+      headlineOpacity: headlineT,
+      headlineTranslateX: lerp(-72, 0, headlineT),
+      subtextOpacity: subtextT,
+      subtextTranslateX: lerp(-56, 0, subtextT),
+    };
+  }
+
+  const subtextT = smoothstep(clamp(t / 0.52));
+  const headlineT = smoothstep(clamp((t - 0.1) / 0.72));
+  return {
+    headlineOpacity: 1 - headlineT,
+    headlineTranslateX: lerp(0, -64, headlineT),
+    subtextOpacity: 1 - subtextT,
+    subtextTranslateX: lerp(0, -48, subtextT),
+  };
+}
+
+function HeroSlideTextTransition({
+  slides,
+  slideIndex,
+  transitionT,
+  frozen = false,
+}: {
+  slides: HeroSlide[];
+  slideIndex: number;
+  transitionT: number;
+  frozen?: boolean;
+}) {
+  const maxIndex = slides.length - 1;
+  const fromIdx = clamp(slideIndex, 0, maxIndex);
+  const toIdx = (fromIdx + 1) % slides.length;
+  const t = frozen ? 0 : clamp(transitionT);
+  const isTransitioning = !frozen && t > 0.001;
+  const [entranceT, setEntranceT] = useState(0);
+  const hasAutoAdvancedRef = useRef(false);
+
+  useEffect(() => {
+    if (frozen || hasAutoAdvancedRef.current) return;
+
+    let raf = 0;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const progress = clamp((now - start) / HERO_TRANSITION_MS);
+      setEntranceT(smoothstep(progress));
+      if (progress < 1) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [frozen]);
+
+  useEffect(() => {
+    if (isTransitioning) {
+      hasAutoAdvancedRef.current = true;
+    }
+  }, [isTransitioning]);
+
+  if (frozen || !isTransitioning) {
+    if (frozen || hasAutoAdvancedRef.current || entranceT >= 1) {
+      return <HeroSlideCopy slide={slides[fromIdx]} />;
+    }
+
+    return (
+      <HeroSlideCopy slide={slides[fromIdx]} {...heroTextMotion(entranceT, "in")} />
+    );
+  }
+
+  const fromSlide = slides[fromIdx];
+  const toSlide = slides[toIdx];
+  const out = heroTextMotion(t, "out");
+  const inn = heroTextMotion(t, "in");
+
+  return (
+    <div className="relative">
+      <div className="absolute inset-x-0 top-0" aria-hidden="true">
+        <HeroSlideCopy slide={fromSlide} {...out} />
+      </div>
+
+      <div className="relative">
+        <HeroSlideCopy slide={toSlide} {...inn} />
+      </div>
+    </div>
+  );
+}
+
 export function HomeScrollExperience({ enabled = true }: { enabled?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const taglineTrackRef = useRef<HTMLDivElement>(null);
@@ -540,7 +679,6 @@ export function HomeScrollExperience({ enabled = true }: { enabled?: boolean }) 
   const {
     slideIndex: heroSlideIndex,
     transitionT: heroTransitionT,
-    activeSlide: activeHeroSlide,
   } = useHeroAutoSlide(handoffT);
 
   // ── Hero handoff: shrink into rounded card, then slide up (single element) ──
@@ -851,43 +989,15 @@ export function HomeScrollExperience({ enabled = true }: { enabled?: boolean }) 
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/55 to-charcoal/25" />
 
           <div
-            className="absolute left-4 top-[30%] z-10 max-w-[calc(100vw-2rem)] sm:left-6 sm:top-[36%] sm:max-w-3xl lg:left-12 lg:top-[40%]"
+            className="absolute left-4 top-[46%] z-10 max-w-[calc(100vw-2rem)] sm:left-6 sm:top-[36%] sm:max-w-3xl lg:left-12 lg:top-[40%]"
             style={{ opacity: headlineOpacity }}
           >
-            <div className="relative grid">
-              {HERO_SLIDES.map((slide, i) => {
-                const isActive = i === activeHeroSlide;
-                return (
-                  <div
-                    key={slide.name}
-                    className="col-start-1 row-start-1 transition-opacity duration-300 ease-out"
-                    style={{
-                      opacity: isActive ? 1 : 0,
-                      visibility: isActive ? "visible" : "hidden",
-                      pointerEvents: isActive ? "auto" : "none",
-                    }}
-                  >
-                    <h1 className="heading-display text-[clamp(2rem,7vw,5.5rem)] leading-[1.05] text-cream sm:text-[clamp(2.5rem,6vw,5.5rem)]">
-                      {slide.headline}
-                    </h1>
-                    {slide.subtext &&
-                      (Array.isArray(slide.subtext)
-                        ? slide.subtext
-                        : [slide.subtext]
-                      ).map((line, lineIndex) => (
-                        <p
-                          key={lineIndex}
-                          className={`max-w-md text-sm leading-relaxed text-cream/75 sm:max-w-lg sm:text-base lg:max-w-xl ${
-                            lineIndex === 0 ? "mt-3 sm:mt-4" : "mt-2 sm:mt-3"
-                          }`}
-                        >
-                          {line}
-                        </p>
-                      ))}
-                  </div>
-                );
-              })}
-            </div>
+            <HeroSlideTextTransition
+              slides={HERO_SLIDES}
+              slideIndex={heroSlideIndex}
+              transitionT={heroTransitionT}
+              frozen={handoffT > 0.01}
+            />
           </div>
 
           <div
