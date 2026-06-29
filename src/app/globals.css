@@ -76,14 +76,6 @@ body {
   color: #383432;
 }
 
-.site-header[data-page="collection"] .site-logo__build {
-  color: #383432;
-}
-
-.site-header[data-page="collection"] .site-header__sep {
-  color: rgb(26 24 20 / 0.35);
-}
-
 .site-header[data-section="beliefs-image"] .site-logo__build {
   color: var(--color-cream) !important;
 }

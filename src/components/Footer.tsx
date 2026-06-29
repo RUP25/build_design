@@ -26,7 +26,6 @@ export function Footer() {
                   { label: "About", href: "/about" },
                   { label: "Services", href: "/services" },
                   { label: "Projects", href: "/projects" },
-                  { label: "Best Sellers", href: "/collections/best-sellers" },
                   { label: "Team", href: "/team" },
                   { label: "Contact", href: "/#contact" },
                 ].map((link) => (

@@ -362,62 +362,6 @@ export const commercialProjects: Project[] = [
   },
 ];
 
-export type CollectionProject = Project & {
-  category: "Residential" | "Commercial";
-  location: string;
-  featured?: boolean;
-  isNew?: boolean;
-};
-
-export const collectionSortOptions = [
-  { value: "featured", label: "Featured" },
-  { value: "name-asc", label: "Alphabetically, A-Z" },
-  { value: "name-desc", label: "Alphabetically, Z-A" },
-  { value: "category", label: "Category" },
-] as const;
-
-export type CollectionSort = (typeof collectionSortOptions)[number]["value"];
-
-export const collectionCategoryFilters = [
-  "All",
-  "Residential",
-  "Commercial",
-] as const;
-
-export const bestSellerProjects: CollectionProject[] = [
-  ...residentialProjects.map((project, index) => ({
-    ...project,
-    category: "Residential" as const,
-    location:
-      index === 5
-        ? "Shillong"
-        : project.name.includes("Ballygunge")
-          ? "Kolkata"
-          : "Kolkata",
-    featured: index < 3,
-    isNew: index === 0,
-  })),
-  ...commercialProjects.map((project, index) => ({
-    ...project,
-    category: "Commercial" as const,
-    location: project.name.includes("Bhubaneswar")
-      ? "Bhubaneswar"
-      : project.name.includes("Airport")
-        ? "Airport"
-        : "Kolkata",
-    featured: index < 2,
-    isNew: index === 0,
-  })),
-];
-
-export const collectionScopeFilters = [
-  ...new Set(bestSellerProjects.map((p) => p.scope)),
-].sort();
-
-export const collectionLocationFilters = [
-  ...new Set(bestSellerProjects.map((p) => p.location)),
-].sort();
-
 export const partners = [
   "ITC Limited",
   "Travel Food Services (TFS)",
