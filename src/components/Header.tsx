@@ -10,6 +10,7 @@ const navLinks = [
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
+  { label: "Best Sellers", href: "/collections/best-sellers" },
   { label: "Team", href: "/team" },
 ];
 
@@ -138,6 +139,12 @@ export function Header() {
     };
   }, [menuOpen]);
 
+  const isCollectionPage = pathname.startsWith("/collections");
+  const useDarkNav =
+    pathname === "/about" ||
+    pathname === "/team" ||
+    isCollectionPage;
+
   const light = overHero || inBeliefsImage;
   const headerSection = inBeliefsImage
     ? "beliefs-image"
@@ -146,8 +153,12 @@ export function Header() {
       : inProjectsCategory
         ? "projects-category"
         : undefined;
-  const navTextClass = "text-white hover:text-white/80";
-  const burgerClass = light ? "bg-white" : "bg-charcoal";
+  const navTextClass =
+    useDarkNav && !overHero
+      ? "text-charcoal hover:text-design"
+      : "text-white hover:text-white/80";
+  const burgerClass =
+    useDarkNav && !overHero ? "bg-charcoal" : light ? "bg-white" : "bg-charcoal";
 
   return (
     <>
@@ -159,8 +170,18 @@ export function Header() {
           pointerEvents: hideHeader ? "none" : "auto",
         }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="site-header fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500"
-        data-page={pathname === "/projects" ? "projects" : undefined}
+        className={`site-header fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isCollectionPage
+            ? "border-b border-charcoal/10 bg-cream/95 backdrop-blur-sm"
+            : "bg-transparent"
+        }`}
+        data-page={
+          pathname === "/projects"
+            ? "projects"
+            : isCollectionPage
+              ? "collection"
+              : undefined
+        }
         data-section={headerSection}
       >
         <div className="site-header__inner grid w-full grid-cols-[1fr_auto] items-center px-4 py-6 sm:px-5 md:grid-cols-[1fr_auto_1fr] lg:px-6 lg:py-7">
