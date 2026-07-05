@@ -73,78 +73,79 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-cream px-4 sm:px-6"
           aria-hidden="true"
         >
-          <div className="flex max-w-full items-center gap-2 whitespace-nowrap sm:gap-5 lg:gap-7">
-            <motion.span
-              layout
-              animate={{ opacity: reveal ? 0 : 1 }}
-              initial={{ opacity: 0, y: 14 }}
-              transition={{ duration: 0.6, ease: EASE }}
-              className="heading-display text-[clamp(2.4rem,9vw,7rem)] leading-none tracking-tight text-build"
-            >
-              BUILD
-            </motion.span>
-
-            <div className="flex w-[clamp(3.4rem,11vw,8.5rem)] shrink-0 flex-col items-center">
+          <div className="flex flex-col items-center">
+            <div className="flex max-w-full items-end gap-2 whitespace-nowrap sm:gap-5 lg:gap-7">
               <motion.span
-                animate={{ opacity: reveal ? 0 : 1, y: reveal ? -8 : 0 }}
-                initial={{ opacity: 0, y: 10 }}
+                layout
+                animate={{ opacity: reveal ? 0 : 1 }}
+                initial={{ opacity: 0, y: 14 }}
                 transition={{ duration: 0.6, ease: EASE }}
-                className="mb-4 w-full text-center text-[11px] tracking-[0.4em] text-warm-gray uppercase sm:mb-5"
-                style={{ paddingLeft: "0.2em" }}
+                className="heading-display text-[clamp(2.4rem,9vw,7rem)] leading-none tracking-tight text-build"
               >
-                Est. 1979
+                BUILD
               </motion.span>
 
-              {/* Framed photo — appears between the words after the initial beat */}
-              {!reveal && shown && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.35 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.55, ease: EASE }}
-                  style={{ borderRadius: 3 }}
-                  className="relative h-[clamp(2.4rem,7.5vw,5.8rem)] w-full shrink-0 overflow-hidden shadow-[0_18px_40px_-18px_rgba(26,24,20,0.45)]"
+              <div className="relative w-[clamp(4rem,13vw,9.5rem)] shrink-0">
+                <motion.span
+                  animate={{ opacity: reveal ? 0 : 1, y: reveal ? -8 : 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.6, ease: EASE }}
+                  className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap text-[10px] tracking-[0.35em] text-warm-gray uppercase sm:mb-4 sm:text-[11px] sm:tracking-[0.4em]"
                 >
-                  {introImages.map((src, i) => (
-                    <motion.img
-                      key={src}
-                      src={src}
-                      alt=""
-                      initial={false}
-                      animate={{ opacity: i === index ? 1 : 0 }}
-                      transition={{ duration: 0.6, ease: EASE }}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      draggable={false}
-                    />
-                  ))}
-                </motion.div>
-              )}
+                  Est. 1979
+                </motion.span>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: shown && !reveal ? 1 : 0 }}
-                transition={{ duration: 0.5, ease: EASE }}
-                className="mt-6 flex items-center gap-2 sm:mt-8"
+                {/* Framed photo — aligned to the BUILD / DESIGN baseline */}
+                {!reveal && shown && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.35 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.55, ease: EASE }}
+                    style={{ borderRadius: 3 }}
+                    className="relative h-[clamp(3rem,9vw,6.5rem)] w-full shrink-0 overflow-hidden shadow-[0_18px_40px_-18px_rgba(26,24,20,0.45)]"
+                  >
+                    {introImages.map((src, i) => (
+                      <motion.img
+                        key={src}
+                        src={src}
+                        alt=""
+                        initial={false}
+                        animate={{ opacity: i === index ? 1 : 0 }}
+                        transition={{ duration: 0.6, ease: EASE }}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        draggable={false}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+
+              <motion.span
+                layout
+                animate={{ opacity: reveal ? 0 : 1 }}
+                initial={{ opacity: 0, y: 14 }}
+                transition={{ duration: 0.6, ease: EASE }}
+                className="heading-display text-[clamp(2.4rem,9vw,7rem)] leading-none tracking-tight text-design"
               >
-                {introImages.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-1 rounded-full transition-all duration-500 ${
-                      i === index ? "w-7 bg-charcoal" : "w-3 bg-charcoal/25"
-                    }`}
-                  />
-                ))}
-              </motion.div>
+                DESIGN
+              </motion.span>
             </div>
 
-            <motion.span
-              layout
-              animate={{ opacity: reveal ? 0 : 1 }}
-              initial={{ opacity: 0, y: 14 }}
-              transition={{ duration: 0.6, ease: EASE }}
-              className="heading-display text-[clamp(2.4rem,9vw,7rem)] leading-none tracking-tight text-design"
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: shown && !reveal ? 1 : 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="mt-6 flex items-center gap-2 sm:mt-8"
             >
-              DESIGN
-            </motion.span>
+              {introImages.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1 rounded-full transition-all duration-500 ${
+                    i === index ? "w-7 bg-charcoal" : "w-3 bg-charcoal/25"
+                  }`}
+                />
+              ))}
+            </motion.div>
           </div>
 
           {/* The same photo opens up to become the full main screen */}
