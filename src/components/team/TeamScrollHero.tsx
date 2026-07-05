@@ -229,7 +229,7 @@ export function TeamScrollHero() {
           }}
         >
           <h2 className="heading-display text-3xl leading-[1.1] text-charcoal sm:text-4xl lg:text-5xl">
-            Rooted in Kolkata. Delivering across India. For 45 years.
+            Rooted in Kolkata. Delivering across India. Since 45 years.
           </h2>
           <Link
             href="/#contact"

@@ -4,15 +4,52 @@ import { useState, FormEvent } from "react";
 import Image from "next/image";
 import { FadeIn, SectionHeading, SectionLabel } from "@/components/ui/FadeIn";
 import { useSectionParallax } from "@/hooks/useSectionParallax";
-import { companyAddress } from "@/lib/content";
+import { companyAddress, companyEmail, companyPhone } from "@/lib/content";
 
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const { sectionRef, parallaxY } = useSectionParallax(0.85);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          message: formData.get("message"),
+          company: formData.get("company"),
+        }),
+      });
+
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Something went wrong. Please try again.");
+      }
+
+      setSubmitted(true);
+      form.reset();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -51,38 +88,21 @@ export function Contact() {
             <div className="space-y-8">
               <div>
                 <p className="section-label mb-3 text-cream/50">Phone</p>
-                <div className="space-y-1">
-                  {["+91 9831038457", "+91 9007406915", "+91 7980441997"].map(
-                    (phone) => (
-                      <a
-                        key={phone}
-                        href={`tel:${phone.replace(/\s/g, "")}`}
-                        className="block text-cream transition-colors hover:text-accent"
-                      >
-                        {phone}
-                      </a>
-                    ),
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <p className="section-label mb-3 text-cream/50">Office</p>
                 <a
-                  href="tel:03322524444"
+                  href={`tel:${companyPhone.tel}`}
                   className="text-cream transition-colors hover:text-accent"
                 >
-                  033 2252 4444
+                  {companyPhone.display}
                 </a>
               </div>
 
               <div>
                 <p className="section-label mb-3 text-cream/50">Email</p>
                 <a
-                  href="mailto:Info@buildesignprojects.com"
+                  href={`mailto:${companyEmail}`}
                   className="text-cream transition-colors hover:text-accent"
                 >
-                  Info@buildesignprojects.com
+                  {companyEmail}
                 </a>
               </div>
 
@@ -119,11 +139,19 @@ export function Contact() {
                     Thank you!
                   </p>
                   <p className="text-warm-gray">
-                    Your submission has been received.
+                    Your submission has been received. We will be in touch soon.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  <input
+                    type="text"
+                    name="company"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className="hidden"
+                    aria-hidden="true"
+                  />
                   <div>
                     <label
                       htmlFor="name"
@@ -136,7 +164,8 @@ export function Contact() {
                       name="name"
                       type="text"
                       required
-                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent"
+                      disabled={submitting}
+                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent disabled:opacity-60"
                     />
                   </div>
                   <div>
@@ -151,7 +180,8 @@ export function Contact() {
                       name="email"
                       type="email"
                       required
-                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent"
+                      disabled={submitting}
+                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent disabled:opacity-60"
                     />
                   </div>
                   <div>
@@ -165,7 +195,8 @@ export function Contact() {
                       id="phone"
                       name="phone"
                       type="tel"
-                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent"
+                      disabled={submitting}
+                      className="w-full border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent disabled:opacity-60"
                     />
                   </div>
                   <div>
@@ -180,18 +211,25 @@ export function Contact() {
                       name="message"
                       rows={4}
                       required
-                      className="w-full resize-none border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent"
+                      disabled={submitting}
+                      className="w-full resize-none border border-charcoal/15 bg-transparent px-4 py-3 text-charcoal outline-none transition-colors focus:border-accent disabled:opacity-60"
                     />
                   </div>
+                  {error && (
+                    <p className="text-sm text-red-700" role="alert">
+                      {error}
+                    </p>
+                  )}
                   <p className="text-xs text-warm-gray">
                     By sending your request, you agree to our privacy policy. We
                     promise to keep your personal information safe and secure.
                   </p>
                   <button
                     type="submit"
-                    className="w-full bg-charcoal py-4 text-xs tracking-[0.15em] text-cream uppercase transition-all hover:bg-accent hover:text-charcoal"
+                    disabled={submitting}
+                    className="w-full bg-charcoal py-4 text-xs tracking-[0.15em] text-cream uppercase transition-all hover:bg-accent hover:text-charcoal disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Send Request
+                    {submitting ? "Sending..." : "Send Request"}
                   </button>
                 </form>
               )}

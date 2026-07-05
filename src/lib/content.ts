@@ -5,17 +5,30 @@ export const stats = [
   { value: "6 Mo.", label: "Post-completion service assurance" },
 ];
 
-/** WhatsApp — E.164 without + prefix for wa.me links */
-export const whatsappContact = {
-  phone: "919831038457",
-  displayPhone: "+91 98310 38457",
-  defaultMessage:
-    "Hello Build Design Projects, I would like to discuss my project.",
+export const companyAddress = {
+  line1: "30, f Mirza Ghalib Street, Ground Floor",
+  line2: "Kolkata - 700016",
+  full: "30, f Mirza Ghalib Street, Ground Floor, Kolkata - 700016",
+  mapsQuery: "30, f Mirza Ghalib Street, Ground Floor, Kolkata 700016",
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=30%2C+f+Mirza+Ghalib+Street%2C+Ground+Floor%2C+Kolkata+700016",
+  mapsEmbedUrl:
+    "https://www.google.com/maps?q=30%2C+f+Mirza+Ghalib+Street%2C+Ground+Floor%2C+Kolkata+700016&z=16&output=embed",
 };
 
-export const companyAddress = {
-  line1: "30f, Mirza Ghalib Street (Free school street)",
-  line2: "Kolkata - 700016",
+export const companyPhone = {
+  display: "+91 9830018777",
+  tel: "919830018777",
+};
+
+export const companyEmail = "Info@buildesignprojects.com";
+
+/** WhatsApp — E.164 without + prefix for wa.me links */
+export const whatsappContact = {
+  phone: companyPhone.tel,
+  displayPhone: companyPhone.display,
+  defaultMessage:
+    "Hello Build Design Projects, I would like to discuss my project.",
 };
 
 export const aboutSpecialization =
@@ -460,12 +473,8 @@ export const beliefs = [
   },
 ];
 
-export type TeamLead = {
-  name: string;
-  role: string;
-  phone: string;
-  photo: string;
-};
+export const teamLeadershipCopy =
+  "Our team comprises experienced engineers, project managers, technical specialists, and execution experts dedicated to delivering every project with precision and accountability. Working as one integrated unit, we combine decades of expertise with trusted partnerships to execute high-value residential and commercial developments across India with uncompromising quality.";
 
 export type TeamPillar = {
   number: string;
@@ -517,37 +526,6 @@ export const teamOrbit: OrbitItem[] = [
     label: "Bhubaneswar",
     image:
       "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600&q=80",
-  },
-];
-
-export const teamLeads: TeamLead[] = [
-  {
-    name: "Rupak Khan",
-    role: "Managing Director",
-    phone: "+91 98310 38457",
-    photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
-  },
-  {
-    name: "Arjun Mehta",
-    role: "Head of Execution",
-    phone: "+91 98300 11223",
-    photo:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80",
-  },
-  {
-    name: "Priya Nair",
-    role: "Design Director",
-    phone: "+91 98311 44556",
-    photo:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80",
-  },
-  {
-    name: "Sandeep Roy",
-    role: "Projects Lead",
-    phone: "+91 98312 77889",
-    photo:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&q=80",
   },
 ];
 

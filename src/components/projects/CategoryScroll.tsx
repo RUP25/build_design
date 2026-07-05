@@ -15,6 +15,8 @@ type CategoryScrollProps = {
 };
 
 const SLATS = 12;
+const SLIDE_INTERVAL_MS = 1500;
+const SLIDE_TRANSITION_MS = 900;
 
 function clamp(v: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
@@ -93,8 +95,18 @@ export function CategoryScroll({
   exitHint = "Continue",
 }: CategoryScrollProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef(0);
+  const autoplayActiveRef = useRef(false);
+  const holdTimerRef = useRef(0);
+  const rafRef = useRef(0);
+  const runTransitionRef = useRef<(() => void) | null>(null);
   const [progress, setProgress] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+
+  progressRef.current = progress;
+
+  const lastIndex = projects.length - 1;
+  const scrollProgress = lastIndex > 0 ? progress / lastIndex : 0;
 
   const scrollBeats = projects.map((_, i) => ({
     end: (i + 1) / projects.length,
@@ -118,57 +130,100 @@ export function CategoryScroll({
         ? 1 - (scrollProgress - 0.78) / 0.16
         : 0;
 
-  const handleScrollDown = () => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const scrollable = container.offsetHeight - window.innerHeight;
-    if (scrollable <= 0) return;
-
-    const nextBeat = scrollBeats.find(
-      (beat) => scrollProgress < beat.end - 0.015,
-    );
-    const targetProgress = nextBeat ? nextBeat.end + 0.01 : 1;
-    const targetY = container.offsetTop + scrollable * targetProgress;
-
-    window.scrollTo({
-      top: targetY,
-      behavior: "smooth",
-    });
+  const clearTimers = () => {
+    window.clearTimeout(holdTimerRef.current);
+    cancelAnimationFrame(rafRef.current);
   };
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const sticky = stickyRef.current;
+    if (!sticky || projects.length <= 1) return;
 
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const rect = container.getBoundingClientRect();
-        const scrollable = container.offsetHeight - window.innerHeight;
-        if (scrollable <= 0) {
-          setProgress(0);
-          setScrollProgress(0);
-          return;
+    const scheduleHold = () => {
+      clearTimers();
+      if (Math.floor(progressRef.current) >= lastIndex) return;
+
+      holdTimerRef.current = window.setTimeout(() => {
+        runTransitionRef.current?.();
+      }, SLIDE_INTERVAL_MS);
+    };
+
+    const runTransition = () => {
+      clearTimers();
+      const from = Math.floor(progressRef.current);
+      if (from >= lastIndex) return;
+
+      const start = performance.now();
+
+      const animate = (now: number) => {
+        const t = clamp((now - start) / SLIDE_TRANSITION_MS);
+        const nextProgress = from + t;
+        progressRef.current = nextProgress;
+        setProgress(nextProgress);
+
+        if (t < 1) {
+          rafRef.current = requestAnimationFrame(animate);
+        } else {
+          const settled = from + 1;
+          progressRef.current = settled;
+          setProgress(settled);
+          scheduleHold();
         }
-        const scrolled = clamp(-rect.top / scrollable);
-        setScrollProgress(scrolled);
-        setProgress(scrolled * (projects.length - 1));
-      });
+      };
+
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    runTransitionRef.current = runTransition;
+
+    const syncAutoplay = (shouldPlay: boolean) => {
+      if (shouldPlay && !autoplayActiveRef.current) {
+        autoplayActiveRef.current = true;
+        scheduleHold();
+      } else if (!shouldPlay && autoplayActiveRef.current) {
+        autoplayActiveRef.current = false;
+        clearTimers();
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        syncAutoplay(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.25, 0.4, 0.5, 0.75, 1] },
+    );
+
+    observer.observe(sticky);
+
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      autoplayActiveRef.current = false;
+      clearTimers();
+      observer.disconnect();
     };
-  }, [projects.length]);
+  }, [lastIndex, projects.length]);
 
-  const lastIndex = projects.length - 1;
+  const handleScrollDown = () => {
+    if (Math.round(progressRef.current) >= lastIndex) {
+      if (sectionId === "projects-residential") {
+        document
+          .getElementById("projects-commercial")
+          ?.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+
+      const container = containerRef.current;
+      if (container) {
+        window.scrollTo({
+          top: container.offsetTop + container.offsetHeight,
+          behavior: "smooth",
+        });
+      }
+      return;
+    }
+
+    runTransitionRef.current?.();
+  };
+
   const currentIndex = Math.min(Math.floor(progress), Math.max(0, lastIndex - 1));
   const nextIndex = Math.min(currentIndex + 1, lastIndex);
   const localT = progress - currentIndex;
@@ -178,13 +233,11 @@ export function CategoryScroll({
   const next = projects[nextIndex];
 
   return (
-    <div
-      ref={containerRef}
-      id={sectionId}
-      style={{ height: `${projects.length * 100}vh` }}
-      className="relative"
-    >
-      <div className="projects-sticky-viewport relative sticky top-0 flex flex-col justify-center overflow-hidden py-4 sm:py-6 lg:h-screen lg:items-center lg:py-0">
+    <div ref={containerRef} id={sectionId} className="relative">
+      <div
+        ref={stickyRef}
+        className="projects-sticky-viewport relative flex flex-col justify-center overflow-hidden py-4 sm:py-6 lg:h-screen lg:items-center lg:py-0"
+      >
         <div className="mx-auto grid w-full max-w-7xl flex-1 content-center items-center gap-6 px-4 sm:gap-8 sm:px-6 md:gap-10 lg:grid-cols-2 lg:gap-20 lg:px-8">
           {/* Text panel */}
           <div className={`min-w-0 ${reverse ? "lg:order-2" : ""}`}>

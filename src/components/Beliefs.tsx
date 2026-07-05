@@ -164,7 +164,7 @@ export function Beliefs() {
         <div className="belief-bubble-panel relative flex min-h-0 flex-col bg-showcase-bg lg:h-full">
           <div className="belief-bubble-stage flex min-h-0 flex-1 items-center justify-center px-4 pb-16 pt-6 lg:items-stretch lg:p-0">
             <div
-              className="belief-bubble-grid mx-auto grid aspect-square w-full max-w-[min(100%,calc(100dvh-16rem))] lg:aspect-auto lg:h-full lg:max-w-none"
+              className="belief-bubble-grid mx-auto grid aspect-square w-full max-w-[min(100%,calc(100dvh-16rem))] sm:max-w-[min(100%,26.5rem)] lg:aspect-auto lg:h-full lg:max-w-none"
               style={{
                 gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
                 gridTemplateRows: `repeat(${ROWS}, minmax(0, 1fr))`,
@@ -175,10 +175,10 @@ export function Beliefs() {
               return (
                 <div
                   key={point}
-                  className="relative flex items-center justify-center overflow-visible"
+                  className="relative flex items-center justify-center overflow-hidden"
                 >
                   <div
-                    className="belief-bubble-shell relative flex aspect-square w-[112%] items-center justify-center will-change-transform lg:w-[150%]"
+                    className="belief-bubble-shell relative flex aspect-square w-[94%] items-center justify-center will-change-transform sm:w-[92%] lg:w-[150%]"
                     style={{
                       opacity: t <= 0 ? 0 : Math.max(0.72, t),
                       transform: `translate(${(1 - t) * 22}px, ${
@@ -194,7 +194,7 @@ export function Beliefs() {
                     >
                       <div className="absolute inset-0 rounded-full border-2 border-showcase-border/75 bg-charcoal/[0.04]" />
                       <div className="absolute left-1/2 top-1/2 aspect-square w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-showcase-border/50" />
-                      <p className="relative z-10 max-w-[58%] text-center font-sans text-[clamp(0.55rem,2.4vw,0.9rem)] font-medium leading-snug text-showcase-title lg:text-[clamp(0.6rem,0.95vw,0.9rem)]">
+                      <p className="belief-bubble-text relative z-10 px-0.5 text-center font-sans font-medium text-showcase-title lg:text-[clamp(0.6rem,0.95vw,0.9rem)]">
                         {point}
                       </p>
                     </div>

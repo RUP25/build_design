@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { teamLeads, teamPillars, partners } from "@/lib/content";
+import { teamLeadershipCopy, teamPillars, partners } from "@/lib/content";
 import { FadeIn, SectionHeading, SectionLabel } from "@/components/ui/FadeIn";
 import { TeamScrollHero } from "@/components/team/TeamScrollHero";
 
@@ -14,39 +14,25 @@ export function Team() {
       {/* Leadership */}
       <section className="bg-charcoal py-20 text-cream lg:py-28">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <FadeIn className="mb-16 max-w-3xl">
-            <p className="section-label mb-6 text-cream/50">(Leadership)</p>
-            <h2 className="heading-display text-4xl text-cream md:text-5xl lg:text-6xl">
-              Who powers Build Design
-            </h2>
-          </FadeIn>
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] lg:items-end lg:gap-20">
+            <FadeIn className="max-w-xl">
+              <p className="section-label mb-6 text-cream/50">(Leadership)</p>
+              <h2 className="heading-display text-4xl text-cream md:text-5xl lg:text-6xl">
+                Who powers Build Design
+              </h2>
+            </FadeIn>
 
-          <div className="grid grid-cols-2 gap-x-8 gap-y-14 lg:grid-cols-4 lg:gap-x-10">
-            {teamLeads.map((lead, i) => (
-              <FadeIn key={lead.name} delay={i * 0.08}>
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative h-40 w-40 overflow-hidden rounded-full lg:h-48 lg:w-48">
-                    <img
-                      src={lead.photo}
-                      alt={lead.name}
-                      className="h-full w-full object-cover grayscale transition-all duration-500 hover:grayscale-0"
-                    />
-                  </div>
-                  <p className="mt-7 text-base text-cream lg:text-lg">
-                    {lead.name}
-                  </p>
-                  <p className="mt-1 text-xs tracking-wide text-cream/50">
-                    {lead.role}
-                  </p>
-                  <a
-                    href={`tel:${lead.phone.replace(/\s/g, "")}`}
-                    className="mt-2 text-sm text-cream/70 transition-colors hover:text-accent"
-                  >
-                    {lead.phone}
-                  </a>
-                </div>
-              </FadeIn>
-            ))}
+            <FadeIn delay={0.12}>
+              <div className="relative max-w-2xl lg:max-w-none lg:pt-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-6 top-1 hidden h-[calc(100%-0.25rem)] w-px bg-accent/50 lg:block"
+                />
+                <p className="text-base leading-[1.9] text-cream/72 sm:text-lg lg:text-xl lg:leading-[1.95]">
+                  {teamLeadershipCopy}
+                </p>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </section>

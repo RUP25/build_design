@@ -108,8 +108,9 @@ export function Header() {
           (id) => {
             const el = document.getElementById(id);
             if (!el) return false;
-            const rect = el.getBoundingClientRect();
-            return rect.top <= 0 && rect.bottom >= vh * 0.45;
+            const sticky = el.querySelector(".projects-sticky-viewport");
+            const rect = (sticky ?? el).getBoundingClientRect();
+            return rect.top < vh * 0.55 && rect.bottom > vh * 0.35;
           },
         );
         setInProjectsCategory(inCategory);

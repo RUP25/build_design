@@ -9,6 +9,9 @@ type ServicesSolutionsScrollProps = {
   services: Service[];
 };
 
+const SLIDE_INTERVAL_MS = 1500;
+const SLIDE_TRANSITION_MS = 900;
+
 function clamp(v: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
 }
@@ -20,9 +23,20 @@ function smoothstep(t: number) {
 
 export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const activeIndexRef = useRef(0);
+  const autoplayActiveRef = useRef(false);
+  const holdTimerRef = useRef(0);
+  const rafRef = useRef(0);
+  const runTransitionRef = useRef<(() => void) | null>(null);
+  const scheduleHoldRef = useRef<(() => void) | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+
+  activeIndexRef.current = activeIndex;
+
+  const scrollProgress =
+    services.length > 0 ? (activeIndex + progress) / services.length : 0;
 
   const scrollBeats = services.map((_, i) => ({
     end: (i + 1) / services.length,
@@ -46,67 +60,94 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
         ? 1 - (scrollProgress - 0.78) / 0.16
         : 0;
 
-  const handleScrollDown = () => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const scrollable = container.offsetHeight - window.innerHeight;
-    if (scrollable <= 0) return;
-
-    const nextBeat = scrollBeats.find(
-      (beat) => scrollProgress < beat.end - 0.015,
-    );
-    const targetProgress = nextBeat ? nextBeat.end + 0.01 : 1;
-    const targetY = container.offsetTop + scrollable * targetProgress;
-
-    window.scrollTo({
-      top: targetY,
-      behavior: "smooth",
-    });
+  const clearTimers = () => {
+    window.clearTimeout(holdTimerRef.current);
+    cancelAnimationFrame(rafRef.current);
   };
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const sticky = stickyRef.current;
+    if (!sticky) return;
 
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const rect = container.getBoundingClientRect();
-        const scrollable = container.offsetHeight - window.innerHeight;
-        if (scrollable <= 0) {
-          setScrollProgress(0);
-          return;
-        }
+    const scheduleHold = () => {
+      clearTimers();
+      if (activeIndexRef.current >= services.length - 1) return;
 
-        const p = clamp(-rect.top / scrollable);
-        setScrollProgress(p);
-        const idx = Math.min(
-          services.length - 1,
-          Math.floor(p * services.length),
-        );
-        const local = p * services.length - idx;
-        setActiveIndex(idx);
-        setProgress(local);
-      });
+      holdTimerRef.current = window.setTimeout(() => {
+        runTransitionRef.current?.();
+      }, SLIDE_INTERVAL_MS);
     };
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    const runTransition = () => {
+      clearTimers();
+      if (activeIndexRef.current >= services.length - 1) return;
+
+      const start = performance.now();
+
+      const animate = (now: number) => {
+        const t = clamp((now - start) / SLIDE_TRANSITION_MS);
+        setProgress(t);
+
+        if (t < 1) {
+          rafRef.current = requestAnimationFrame(animate);
+        } else {
+          const nextIndex = activeIndexRef.current + 1;
+          activeIndexRef.current = nextIndex;
+          setActiveIndex(nextIndex);
+          setProgress(0);
+          scheduleHold();
+        }
+      };
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    runTransitionRef.current = runTransition;
+    scheduleHoldRef.current = scheduleHold;
+
+    const syncAutoplay = (shouldPlay: boolean) => {
+      if (shouldPlay && !autoplayActiveRef.current) {
+        autoplayActiveRef.current = true;
+        scheduleHold();
+      } else if (!shouldPlay && autoplayActiveRef.current) {
+        autoplayActiveRef.current = false;
+        clearTimers();
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        syncAutoplay(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.25, 0.4, 0.5, 0.75, 1] },
+    );
+
+    observer.observe(sticky);
+
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      autoplayActiveRef.current = false;
+      clearTimers();
+      observer.disconnect();
     };
   }, [services.length]);
+
+  const handleScrollDown = () => {
+    if (activeIndexRef.current >= services.length - 1) {
+      document.getElementById("beliefs")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    runTransitionRef.current?.();
+  };
 
   const scrollHeight = `${Math.max(services.length, 1) * 110}vh`;
 
   return (
     <section id="solutions" ref={containerRef} style={{ height: scrollHeight }}>
-      <div className="services-sticky-viewport relative sticky top-0 overflow-hidden bg-charcoal text-cream">
+      <div
+        ref={stickyRef}
+        className="services-sticky-viewport relative sticky top-0 overflow-hidden bg-charcoal text-cream"
+      >
         <div className="mx-auto flex h-full max-w-7xl flex-col px-4 pb-14 pt-[4.75rem] sm:px-6 sm:py-20 lg:px-10 lg:py-24">
           <div className="mb-4 flex shrink-0 items-end justify-between gap-4 sm:mb-8 sm:gap-6">
             <div>
