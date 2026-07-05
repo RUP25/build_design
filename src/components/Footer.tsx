@@ -1,4 +1,4 @@
-import { companyAddress, companyPhone } from "@/lib/content";
+import { companyAddress, companyEmail, companyPhone } from "@/lib/content";
 
 function FooterMap({ className = "" }: { className?: string }) {
   return (
@@ -69,9 +69,12 @@ export function Footer() {
 
             <div className="min-w-0 shrink-0">
               <p className="section-label mb-4 text-cream/50">Contact</p>
-              <p className="mb-4 text-sm text-cream/70">
-                Info@buildesignprojects.com
-              </p>
+              <a
+                href={`mailto:${companyEmail}`}
+                className="mb-4 block text-sm text-cream/70 transition-colors hover:text-cream"
+              >
+                {companyEmail}
+              </a>
               <p className="mb-4 text-sm text-cream/70">{companyPhone.display}</p>
               <p className="section-label mb-2 text-cream/50">Address</p>
               <address className="not-italic text-sm leading-relaxed text-cream/70">

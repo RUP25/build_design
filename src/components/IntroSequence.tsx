@@ -73,7 +73,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-cream px-4 sm:px-6"
           aria-hidden="true"
         >
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center pb-8 sm:pb-10">
             <div className="flex max-w-full items-end gap-2 whitespace-nowrap sm:gap-5 lg:gap-7">
               <motion.span
                 layout
@@ -118,6 +118,22 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                     ))}
                   </motion.div>
                 )}
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: shown && !reveal ? 1 : 0 }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="absolute left-1/2 top-full mt-3 flex -translate-x-1/2 items-center justify-center gap-2 sm:mt-4"
+                >
+                  {introImages.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1 rounded-full transition-all duration-500 ${
+                        i === index ? "w-7 bg-charcoal" : "w-3 bg-charcoal/25"
+                      }`}
+                    />
+                  ))}
+                </motion.div>
               </div>
 
               <motion.span
@@ -130,22 +146,6 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 DESIGN
               </motion.span>
             </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: shown && !reveal ? 1 : 0 }}
-              transition={{ duration: 0.5, ease: EASE }}
-              className="mt-6 flex items-center gap-2 sm:mt-8"
-            >
-              {introImages.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1 rounded-full transition-all duration-500 ${
-                    i === index ? "w-7 bg-charcoal" : "w-3 bg-charcoal/25"
-                  }`}
-                />
-              ))}
-            </motion.div>
           </div>
 
           {/* The same photo opens up to become the full main screen */}

@@ -140,15 +140,13 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
     runTransitionRef.current?.();
   };
 
-  const scrollHeight = `${Math.max(services.length, 1) * 110}vh`;
-
   return (
-    <section id="solutions" ref={containerRef} style={{ height: scrollHeight }}>
+    <section id="solutions" ref={containerRef} className="relative">
       <div
         ref={stickyRef}
-        className="services-sticky-viewport relative sticky top-0 overflow-hidden bg-charcoal text-cream"
+        className="services-sticky-viewport relative overflow-hidden bg-charcoal text-cream"
       >
-        <div className="mx-auto flex h-full max-w-7xl flex-col px-4 pb-14 pt-[4.75rem] sm:px-6 sm:py-20 lg:px-10 lg:py-24">
+        <div className="mx-auto flex h-full max-w-7xl flex-col px-4 pb-14 pt-[4.75rem] sm:px-6 sm:pb-16 sm:pt-20 lg:px-10 lg:py-16">
           <div className="mb-4 flex shrink-0 items-end justify-between gap-4 sm:mb-8 sm:gap-6">
             <div>
               <p className="section-label mb-2 text-cream/50 sm:mb-4">Our offer</p>
@@ -182,7 +180,7 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
               return (
                 <div
                   key={service.title}
-                  className="absolute inset-0 grid min-h-0 grid-rows-[1fr_auto] gap-4 will-change-[transform,opacity] sm:gap-6 lg:grid-cols-2 lg:grid-rows-none lg:gap-12"
+                  className="absolute inset-0 grid min-h-0 grid-rows-[auto_1fr] gap-4 will-change-[transform,opacity] sm:gap-6 lg:grid-cols-2 lg:grid-rows-none lg:gap-12"
                   style={{
                     opacity,
                     transform: `translate3d(0, ${translateY}px, 0)`,
@@ -215,7 +213,7 @@ export function ServicesSolutionsScroll({ services }: ServicesSolutionsScrollPro
                     </ul>
                   </div>
 
-                  <div className="services-solutions-image relative min-h-[200px] shrink-0 overflow-hidden rounded-sm sm:min-h-[240px] lg:min-h-0 lg:shrink">
+                  <div className="services-solutions-image relative min-h-0 overflow-hidden rounded-sm lg:shrink">
                     <Image
                       src={service.image}
                       alt={service.title}

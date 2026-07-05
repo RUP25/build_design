@@ -82,9 +82,10 @@ export function Header() {
 
       const solutionsEl = document.getElementById("solutions");
       if (pathname === "/services" && solutionsEl) {
-        const rect = solutionsEl.getBoundingClientRect();
+        const sticky = solutionsEl.querySelector(".services-sticky-viewport");
+        const rect = (sticky ?? solutionsEl).getBoundingClientRect();
         const vh = window.innerHeight;
-        setInServicesSolutions(rect.top <= 0 && rect.bottom >= vh * 0.45);
+        setInServicesSolutions(rect.top < vh * 0.55 && rect.bottom > vh * 0.35);
       } else {
         setInServicesSolutions(false);
       }

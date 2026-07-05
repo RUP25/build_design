@@ -21,7 +21,7 @@ export const companyPhone = {
   tel: "919830018777",
 };
 
-export const companyEmail = "Info@buildesignprojects.com";
+export const companyEmail = "Info@buildesignprojetcs.com";
 
 /** WhatsApp — E.164 without + prefix for wa.me links */
 export const whatsappContact = {

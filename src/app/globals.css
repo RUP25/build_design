@@ -253,53 +253,58 @@ body {
 
 @media (max-width: 1023px) {
   #beliefs .beliefs-sticky-viewport {
-    grid-template-rows: minmax(14.5rem, 48dvh) minmax(0, 1fr);
+    grid-template-rows: minmax(10rem, 34dvh) minmax(27rem, 1fr);
   }
 
   #beliefs .beliefs-image-panel {
-    min-height: 14.5rem;
+    min-height: 10rem;
   }
 
   #beliefs .belief-bubble-panel {
-    min-height: 0;
+    min-height: 30rem;
   }
 
   #beliefs .belief-bubble-stage {
-    overflow: hidden;
+    overflow: visible;
+    padding-top: 0.125rem;
+    padding-bottom: 1.25rem;
   }
 
   #beliefs .belief-bubble-grid {
+    width: min(100vw, calc(100dvh - 6.5rem));
     height: auto;
-    width: min(100%, calc(100vw - 2rem));
-    max-height: min(100%, calc(100dvh - 17rem));
+    max-height: none;
     aspect-ratio: 1 / 1;
   }
 
   #beliefs .belief-bubble-shell {
-    width: 94%;
+    width: 98%;
+  }
+
+  #beliefs .belief-bubble-drift {
+    animation: none;
   }
 
   #beliefs .belief-bubble-text {
     max-width: 72%;
-    font-size: clamp(0.5rem, 1.45vw, 0.68rem);
-    line-height: 1.28;
+    font-size: clamp(0.5rem, 2.6vw, 0.62rem);
+    line-height: 1.24;
   }
 }
 
 @media (min-width: 640px) and (max-width: 1023px) {
   #beliefs .belief-bubble-grid {
-    width: min(100%, 26.5rem);
-    max-height: min(calc(100dvh - 18rem), 26.5rem);
+    width: min(100vw, 42rem);
   }
 
   #beliefs .belief-bubble-shell {
-    width: 92%;
+    width: 100%;
   }
 
   #beliefs .belief-bubble-text {
     max-width: 68%;
-    font-size: 0.625rem;
-    line-height: 1.3;
+    font-size: 0.58rem;
+    line-height: 1.26;
   }
 }
 
@@ -592,6 +597,10 @@ body {
 
 /* ── Services page responsive ─────────────────────────────────────────────── */
 
+.services-solutions-image {
+  min-height: 200px;
+}
+
 .services-sticky-viewport {
   height: 100vh;
   height: 100dvh;
@@ -611,5 +620,11 @@ body {
   .services-solutions-image {
     min-height: 180px !important;
     max-height: 34vh;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .services-solutions-image {
+    min-height: 240px;
   }
 }
