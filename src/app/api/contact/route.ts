@@ -23,6 +23,27 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
+function getFromAddress() {
+  const address =
+    process.env.CONTACT_FROM_ADDRESS?.trim() ||
+    process.env.CONTACT_FROM_EMAIL?.trim();
+
+  if (!address) {
+    return "Build Design Projects <onboarding@resend.dev>";
+  }
+
+  if (address.includes("<") && address.includes("@")) {
+    return address;
+  }
+
+  if (address.includes("@")) {
+    const name = process.env.CONTACT_FROM_NAME?.trim() || "Build Design Projects";
+    return `${name} <${address}>`;
+  }
+
+  return address;
+}
+
 export async function POST(request: Request) {
   if (!resend) {
     return NextResponse.json(
@@ -60,9 +81,7 @@ export async function POST(request: Request) {
   }
 
   const to = process.env.CONTACT_TO_EMAIL ?? companyEmail;
-  const from =
-    process.env.CONTACT_FROM_EMAIL ??
-    "Build Design Projects <onboarding@resend.dev>";
+  const from = getFromAddress();
 
   const { error } = await resend.emails.send({
     from,
@@ -82,7 +101,11 @@ export async function POST(request: Request) {
   if (error) {
     console.error("Resend error:", error);
     return NextResponse.json(
-      { error: "Unable to send your request. Please try again." },
+      {
+        error:
+          error.message ||
+          "Unable to send your request. Please try again.",
+      },
       { status: 500 },
     );
   }
