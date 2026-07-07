@@ -1,12 +1,31 @@
 import type { Metadata } from "next";
 import { ProjectsPage } from "@/components/ProjectsPage";
+import { PageSeo } from "@/components/seo/PageSeo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Projects | Build Design Projects",
+export const metadata: Metadata = createPageMetadata({
+  title: "Projects",
   description:
-    "A curated portfolio of high-value residential and commercial turnkey executions — precision, discretion, and long-term value.",
-};
+    "View Build Design Projects portfolio of luxury residential and commercial turnkey executions across India, including premium homes, corporate environments, and high-spec commercial spaces.",
+  path: "/projects",
+  keywords: [
+    "luxury residential projects India",
+    "commercial interior portfolio",
+    "Kolkata luxury home projects",
+    "turnkey project showcase",
+  ],
+});
 
 export default function Page() {
-  return <ProjectsPage />;
+  return (
+    <>
+      <PageSeo
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Projects", path: "/projects" },
+        ]}
+      />
+      <ProjectsPage />
+    </>
+  );
 }

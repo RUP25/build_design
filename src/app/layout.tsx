@@ -5,7 +5,13 @@ import {
   Fira_Sans,
   Host_Grotesk,
 } from "next/font/google";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { notoSerif } from "@/lib/fonts";
+import {
+  createOrganizationSchema,
+  createWebSiteSchema,
+  rootMetadata,
+} from "@/lib/seo";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import "./globals.css";
 
@@ -37,18 +43,7 @@ const firaSans = Fira_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Build Design Projects | One-Stop Turnkey Execution Since 1979",
-  description:
-    "Premium turnkey execution partner for high-value residential and commercial developments across India. Construction, engineering, global sourcing, and lifestyle integrations — delivered end-to-end.",
-  keywords: [
-    "turnkey construction",
-    "luxury residential",
-    "commercial execution",
-    "Build Design Projects",
-    "India",
-  ],
-};
+export const metadata: Metadata = rootMetadata;
 
 export default function RootLayout({
   children,
@@ -57,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${cormorant.variable} ${dmSans.variable} ${hostGrotesk.variable} ${firaSans.variable} ${notoSerif.variable}`}
     >
       <head>
@@ -65,6 +60,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body className="antialiased">
+        <JsonLd data={[createOrganizationSchema(), createWebSiteSchema()]} />
         {children}
         <WhatsAppFloatingButton />
       </body>

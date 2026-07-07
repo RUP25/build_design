@@ -1,8 +1,8 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-const CONTACT_LIMIT = 5;
-const CONTACT_WINDOW = "15 m";
+const CONTACT_LIMIT = 3;
+const CONTACT_WINDOW = "30 m";
 
 function getRedisUrl() {
   return (
