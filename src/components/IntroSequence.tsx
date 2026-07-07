@@ -2,6 +2,11 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import {
+  getAdaptiveImageQuality,
+  optimizeUnsplashUrl,
+  preloadImage,
+} from "@/lib/image-url";
 
 // The final photo is the SAME url as the Hero background, so the framed
 // photo "opens up" seamlessly into the main screen.
@@ -13,6 +18,9 @@ const introImages = [
   "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80",
   HERO_IMAGE,
 ];
+
+const INTRO_FRAME_WIDTH = 720;
+const HERO_REVEAL_WIDTH = 1280;
 
 const INITIAL_DELAY_MS = 750;
 const HOLD_MS = 850;
@@ -29,10 +37,37 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    introImages.forEach((src) => {
-      const img = new window.Image();
-      img.src = src;
-    });
+    const quality = getAdaptiveImageQuality(75);
+
+    preloadImage(
+      optimizeUnsplashUrl(introImages[0], {
+        width: INTRO_FRAME_WIDTH,
+        quality,
+      }),
+    );
+
+    const secondTimer = window.setTimeout(() => {
+      preloadImage(
+        optimizeUnsplashUrl(introImages[1], {
+          width: INTRO_FRAME_WIDTH,
+          quality,
+        }),
+      );
+    }, 400);
+
+    const heroTimer = window.setTimeout(() => {
+      preloadImage(
+        optimizeUnsplashUrl(HERO_IMAGE, {
+          width: HERO_REVEAL_WIDTH,
+          quality,
+        }),
+      );
+    }, 900);
+
+    return () => {
+      window.clearTimeout(secondTimer);
+      window.clearTimeout(heroTimer);
+    };
   }, []);
 
   // First just "BUILD DESIGN", then the photo appears between the words.
@@ -107,8 +142,12 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                     {introImages.map((src, i) => (
                       <motion.img
                         key={src}
-                        src={src}
+                        src={optimizeUnsplashUrl(src, {
+                          width: INTRO_FRAME_WIDTH,
+                        })}
                         alt=""
+                        decoding="async"
+                        fetchPriority={i === 0 ? "high" : "low"}
                         initial={false}
                         animate={{ opacity: i === index ? 1 : 0 }}
                         transition={{ duration: 0.6, ease: EASE }}
@@ -158,8 +197,10 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               transition={{ duration: 0.9, ease: EASE }}
             >
               <img
-                src={HERO_IMAGE}
+                src={optimizeUnsplashUrl(HERO_IMAGE, { width: HERO_REVEAL_WIDTH })}
                 alt=""
+                decoding="async"
+                fetchPriority="high"
                 className="h-full w-full object-cover"
                 draggable={false}
               />

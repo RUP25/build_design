@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { companyEmail } from "@/lib/content";
+import {
+  getRequestIp,
+  isContactRateLimitConfigured,
+  limitContactRequest,
+} from "@/lib/rate-limit";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -50,6 +55,48 @@ export async function POST(request: Request) {
       { error: "Email service is not configured." },
       { status: 503 },
     );
+  }
+
+  if (!isContactRateLimitConfigured()) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("Contact rate limiting is not configured in production.");
+      return NextResponse.json(
+        { error: "Service temporarily unavailable. Please try again later." },
+        { status: 503 },
+      );
+    }
+  } else {
+    const ip = getRequestIp(request);
+    const rateLimit = await limitContactRequest(`contact:${ip}`);
+
+    if (!rateLimit) {
+      console.error("Contact rate limit check failed.");
+      return NextResponse.json(
+        { error: "Service temporarily unavailable. Please try again later." },
+        { status: 503 },
+      );
+    }
+
+    const { success, limit, remaining, reset } = rateLimit;
+
+    if (!success) {
+      const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
+
+      return NextResponse.json(
+        {
+          error: `Too many submissions. Please wait ${retryAfter} seconds before trying again.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(limit),
+            "X-RateLimit-Remaining": String(remaining),
+            "X-RateLimit-Reset": String(reset),
+            "Retry-After": String(retryAfter),
+          },
+        },
+      );
+    }
   }
 
   let body: ContactPayload;

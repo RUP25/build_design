@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  optimizeUnsplashUrl,
+  unsplashSrcSet,
+} from "@/lib/image-url";
+
 function clamp(v: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
 }
@@ -32,12 +37,20 @@ export function HeroBlindTransition({
   const toImage = slides[toIdx].image;
   const t = frozen ? 0 : clamp(transitionT);
   const isTransitioning = !frozen && t > 0.001 && fromImage !== toImage;
+  const heroSrcSet = unsplashSrcSet(fromImage, [640, 960, 1280, 1600]);
+  const heroSrc = optimizeUnsplashUrl(fromImage, { width: 1280 });
+  const toHeroSrc = optimizeUnsplashUrl(toImage, { width: 1280 });
+  const toHeroSrcSet = unsplashSrcSet(toImage, [640, 960, 1280, 1600]);
 
   if (!isTransitioning) {
     return (
       <img
-        src={fromImage}
+        src={heroSrc}
+        srcSet={heroSrcSet}
+        sizes="100vw"
         alt={slides[fromIdx].name}
+        decoding="async"
+        fetchPriority="high"
         className="absolute inset-0 h-full w-full object-cover"
         draggable={false}
       />
@@ -57,8 +70,11 @@ export function HeroBlindTransition({
   return (
     <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
       <img
-        src={fromImage}
+        src={heroSrc}
+        srcSet={heroSrcSet}
+        sizes="100vw"
         alt=""
+        decoding="async"
         className="absolute inset-0 h-full w-full origin-center object-cover will-change-transform"
         style={{
           opacity: outOpacity,
@@ -69,8 +85,11 @@ export function HeroBlindTransition({
         draggable={false}
       />
       <img
-        src={toImage}
+        src={toHeroSrc}
+        srcSet={toHeroSrcSet}
+        sizes="100vw"
         alt={slides[toIdx].name}
+        decoding="async"
         className="absolute inset-0 h-full w-full origin-center object-cover will-change-transform"
         style={{
           opacity: inOpacity,

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { beliefs, coreAdvantages, approachPoints } from "@/lib/content";
+import { optimizeUnsplashUrl } from "@/lib/image-url";
 import { ScrollAdvanceControl } from "@/components/ui/ScrollAdvanceControl";
 
 // Cycling project imagery for the left panel (Reaktor-style split section).
@@ -115,9 +116,11 @@ export function Beliefs() {
           {BELIEF_IMAGES.map((src, i) => (
             <img
               key={src}
-              src={src}
+              src={optimizeUnsplashUrl(src, { width: 960 })}
               alt=""
               draggable={false}
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[900ms] ease-out"
               style={{ opacity: i === active ? 1 : 0 }}
             />

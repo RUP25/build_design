@@ -11,28 +11,28 @@ import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "700"],
   variable: "--font-cormorant",
   display: "swap",
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   variable: "--font-dm-sans",
   display: "swap",
 });
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   variable: "--font-host-grotesk",
   display: "swap",
 });
 
 const firaSans = Fira_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-fira-sans",
   display: "swap",
 });
@@ -60,6 +60,10 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${dmSans.variable} ${hostGrotesk.variable} ${firaSans.variable} ${notoSerif.variable}`}
     >
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className="antialiased">
         {children}
         <WhatsAppFloatingButton />

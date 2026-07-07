@@ -2,13 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { optimizeUnsplashUrl } from "@/lib/image-url";
 
 export function Hero() {
   return (
     <section className="relative flex min-h-screen items-end overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80"
+          src={optimizeUnsplashUrl(
+            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80",
+            { width: 1600 },
+          )}
           alt="Luxury residential architecture"
           fill
           priority
