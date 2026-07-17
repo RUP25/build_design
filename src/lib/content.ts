@@ -10,10 +10,9 @@ export const companyAddress = {
   line2: "Kolkata - 700016",
   full: "30, f Mirza Ghalib Street, Ground Floor, Kolkata - 700016",
   mapsQuery: "30, f Mirza Ghalib Street, Ground Floor, Kolkata 700016",
-  mapsUrl:
-    "https://www.google.com/maps/search/?api=1&query=30%2C+f+Mirza+Ghalib+Street%2C+Ground+Floor%2C+Kolkata+700016",
+  mapsUrl: "https://maps.app.goo.gl/EfCdTJnw4wMJyvZB7",
   mapsEmbedUrl:
-    "https://www.google.com/maps?q=30%2C+f+Mirza+Ghalib+Street%2C+Ground+Floor%2C+Kolkata+700016&z=16&output=embed",
+    "https://www.google.com/maps?cid=14356460502265530803&output=embed",
 };
 
 export const companyPhone = {
@@ -21,7 +20,7 @@ export const companyPhone = {
   tel: "919830018777",
 };
 
-export const companyEmail = "Info@buildesignprojetcs.com";
+export const companyEmail = "Info@buildesignprojects.com";
 
 /** WhatsApp — E.164 without + prefix for wa.me links */
 export const whatsappContact = {

@@ -34,7 +34,7 @@ function getFromAddress() {
     process.env.CONTACT_FROM_EMAIL?.trim();
 
   if (!address) {
-    return "Build Design Projects <onboarding@resend.dev>";
+    return "Build Design Projects <hello@buildesignprojects.com>";
   }
 
   if (address.includes("<") && address.includes("@")) {

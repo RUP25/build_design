@@ -55,7 +55,7 @@ export function About() {
         <div className="grid items-end gap-14 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           <FadeIn>
             <SectionLabel>About</SectionLabel>
-            <SectionHeading className="mb-6 max-w-xl text-balance">
+            <SectionHeading as="h1" className="mb-6 max-w-xl text-balance">
               Effortless Execution, Limitless Capability.
             </SectionHeading>
             <p className="mb-10 max-w-lg text-base leading-relaxed text-warm-gray md:text-lg">

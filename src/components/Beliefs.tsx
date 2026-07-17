@@ -118,6 +118,7 @@ export function Beliefs() {
               key={src}
               src={optimizeUnsplashUrl(src, { width: 960 })}
               alt=""
+              aria-hidden="true"
               draggable={false}
               loading="lazy"
               decoding="async"

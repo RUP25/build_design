@@ -43,15 +43,17 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 export function SectionHeading({
   children,
   className = "",
+  as: Tag = "h2",
 }: {
   children: ReactNode;
   className?: string;
+  as?: "h1" | "h2" | "h3";
 }) {
   return (
-    <h2
+    <Tag
       className={`heading-display text-4xl md:text-5xl lg:text-6xl text-charcoal ${className}`}
     >
       {children}
-    </h2>
+    </Tag>
   );
 }

@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://www.buildesignprojetcs.com";
+const DEFAULT_SITE_URL = "https://www.buildesignprojects.com";
 
 function normalizeSiteUrl(url: string) {
   const trimmed = url.trim().replace(/\/$/, "");

@@ -27,6 +27,13 @@ export function absoluteUrl(path: string) {
   return `${siteUrl}${normalizedPath === "/" ? "" : normalizedPath}`;
 }
 
+// Social share cards (WhatsApp, etc.) always show the site-wide branding,
+// regardless of which page URL is shared. Page-specific titles/descriptions
+// are kept for search engines only.
+const shareCardTitle = `${siteName} | ${siteTagline}`;
+const shareCardDescription =
+  "Premium turnkey execution partner for high-value residential and commercial developments across India.";
+
 export function createPageMetadata({
   title,
   description,
@@ -50,14 +57,14 @@ export function createPageMetadata({
       locale: "en_IN",
       url: canonical,
       siteName,
-      title: `${title} | ${siteName}`,
-      description,
+      title: shareCardTitle,
+      description: shareCardDescription,
       images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | ${siteName}`,
-      description,
+      title: shareCardTitle,
+      description: shareCardDescription,
       images: [ogImage.url],
     },
     robots: noIndex
