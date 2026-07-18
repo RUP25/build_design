@@ -91,7 +91,7 @@ export function createOrganizationSchema() {
     "@id": `${siteUrl}/#organization`,
     name: siteName,
     url: siteUrl,
-    logo: absoluteUrl("/icon.svg"),
+    logo: absoluteUrl("/logo.png"),
     image: defaultOgImage.url,
     description:
       "Premium turnkey execution partner for high-value residential and commercial developments across India since 1979.",
@@ -234,9 +234,15 @@ export const rootMetadata: Metadata = {
   publisher: siteName,
   category: "construction",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   formatDetection: {
     email: false,

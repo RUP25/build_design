@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title id="title">Build Design Projects</title>
-  <rect width="512" height="512" rx="72" fill="#172218"/>
-  <path d="M96 96h137c72 0 119 31 119 88 0 35-19 61-54 76 48 12 75 43 75 87 0 68-53 105-143 105H96V96zm79 65v72h50c31 0 47-12 47-37 0-24-16-35-48-35h-49zm0 133v93h58c39 0 59-16 59-47 0-30-20-46-60-46h-57z" fill="#cda966"/>
-  <path d="M378 96h38v122h-38z" fill="#f4f0e8"/>
-</svg>
