@@ -7,14 +7,14 @@ function normalizeSiteUrl(url: string) {
 
 export const siteName = "Build Design Projects";
 export const siteTagline = "One-Stop Turnkey Execution Since 1979";
+export const isPreviewDeployment = process.env.VERCEL_ENV === "preview";
 
 export const siteUrl = normalizeSiteUrl(
-  process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : DEFAULT_SITE_URL),
+  process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL,
 );
 
 export const defaultOgImage = {
-  url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop",
+  url: `${siteUrl}/opengraph-image`,
   width: 1200,
   height: 630,
   alt: "Build Design Projects — luxury turnkey construction and interior execution",

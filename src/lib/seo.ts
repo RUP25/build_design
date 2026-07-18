@@ -7,6 +7,7 @@ import {
 } from "@/lib/content";
 import {
   defaultOgImage,
+  isPreviewDeployment,
   siteKeywords,
   siteName,
   siteTagline,
@@ -67,7 +68,7 @@ export function createPageMetadata({
       description: shareCardDescription,
       images: [ogImage.url],
     },
-    robots: noIndex
+    robots: noIndex || isPreviewDeployment
       ? { index: false, follow: false }
       : {
           index: true,
@@ -90,7 +91,7 @@ export function createOrganizationSchema() {
     "@id": `${siteUrl}/#organization`,
     name: siteName,
     url: siteUrl,
-    logo: absoluteUrl("/icon.png"),
+    logo: absoluteUrl("/icon.svg"),
     image: defaultOgImage.url,
     description:
       "Premium turnkey execution partner for high-value residential and commercial developments across India since 1979.",
@@ -109,7 +110,15 @@ export function createOrganizationSchema() {
       addressRegion: "West Bengal",
       addressCountry: "IN",
     },
-    sameAs: [companyAddress.mapsUrl],
+    hasMap: companyAddress.mapsUrl,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: companyPhone.display,
+      email: companyEmail,
+      contactType: "customer service",
+      areaServed: "IN",
+      availableLanguage: "English",
+    },
   };
 }
 
@@ -125,6 +134,57 @@ export function createWebSiteSchema() {
       "@id": `${siteUrl}/#organization`,
     },
     inLanguage: "en-IN",
+  };
+}
+
+export function createWebPageSchema({
+  name,
+  description,
+  path,
+  type = "WebPage",
+}: {
+  name: string;
+  description: string;
+  path: string;
+  type?: "WebPage" | "AboutPage" | "CollectionPage";
+}) {
+  const url = absoluteUrl(path);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    "@id": `${url}/#webpage`,
+    url,
+    name,
+    description,
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    about: { "@id": `${siteUrl}/#organization` },
+    inLanguage: "en-IN",
+  };
+}
+
+export function createServicesSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Turnkey construction and interior execution services",
+    itemListElement: [
+      "Construction & Structural Execution",
+      "Engineering & Systems Integration",
+      "Materials, Finishes & Installations",
+      "Lifestyle & Luxury Integrations",
+      "Global Sourcing & High-End Procurement",
+      "Prefab & Advanced Build Systems",
+    ].map((name, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Service",
+        name,
+        provider: { "@id": `${siteUrl}/#organization` },
+        areaServed: { "@type": "Country", name: "India" },
+      },
+    })),
   };
 }
 
@@ -168,10 +228,16 @@ export const rootMetadata: Metadata = {
     "Premium turnkey execution partner for high-value residential and commercial developments across India. Construction, engineering, global sourcing, and lifestyle integrations — delivered end-to-end since 1979.",
   keywords: siteKeywords,
   applicationName: siteName,
+  manifest: "/manifest.webmanifest",
   authors: [{ name: siteName, url: siteUrl }],
   creator: siteName,
   publisher: siteName,
   category: "construction",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -197,17 +263,19 @@ export const rootMetadata: Metadata = {
       "Premium turnkey execution partner for high-value residential and commercial developments across India.",
     images: [defaultOgImage.url],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
+  robots: isPreviewDeployment
+    ? { index: false, follow: false }
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
+      },
   ...(process.env.GOOGLE_SITE_VERIFICATION || process.env.BING_SITE_VERIFICATION
     ? {
         verification: {
